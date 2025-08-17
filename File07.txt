@@ -1,6 +1,3 @@
 Test file 
-<<<<<<< HEAD
 i am adding text in file07
-=======
 55 +66
->>>>>>> main
