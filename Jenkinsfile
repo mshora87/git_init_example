@@ -15,7 +15,7 @@ pipeline {
 
   triggers {
     // Uncomment one:
-     pollSCM('H/1 * * * *')  // poll every ~1 min
+     pollSCM('* * * * *')  // poll every ~1 min
     // OR set a GitHub webhook to trigger on push (recommended)
   }
 
