@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Capitalize Converter Application</title>
+  <style>
+    :root {
+      --bg: #2a2a0f;      /* slate-900 */
+      --panel: #1e1127;   /* gray-900 */
+      --ink: #ebe5e5;     /* gray-200 */
+      --muted: #94b895;   /* slate-400 */
+      --accent: #22d3ee;  /* cyan-400 */
+      --accent-2: #a78bfa;/* violet-400 */
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      background: radial-gradient(1200px 800px at 70% -10%, rgba(34,211,238,.08), transparent),
+                  radial-gradient(1000px 700px at 10% 110%, rgba(167,139,250,.08), transparent),
+                  var(--bg);
+      color: var(--ink);
+      min-height: 100svh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+    .card {
+      width: min(920px, 100%);
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+      overflow: hidden;
+    }
+    header {
+      padding: 20px 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255,255,255,.07);
+      background: linear-gradient(90deg, rgba(34,211,238,.12), rgba(167,139,250,.12));
+    }
+    header h1 { margin: 0; font-size: clamp(18px, 2.2vw, 24px); letter-spacing: .2px; }
+    header .hint { font-size: 12px; color: var(--panel); background: rgba(255, 255, 255, 0.353); padding: 4px 8px; border-radius: 999px; }
+
+    .body { padding: 18px; display: grid; gap: 14px; }
+    label { font-size: 14px; color: var(--muted); }
+
+    textarea, .output {
+      width: 100%;
+      min-height: 130px;
+      color: var(--ink);
+      background: rgba(17,24,39,.6);
+      border: 1px solid rgba(255,255,255,.07);
+      border-radius: 14px;
+      padding: 12px 14px;
+      outline: none;
+      resize: vertical;
+      line-height: 1.5;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    textarea:focus { border-color: rgba(34,211,238,.6); box-shadow: 0 0 0 4px rgba(34,211,238,.12); }
+
+    .row { display: grid; gap: 10px; }
+    .row.cols { grid-template-columns: 1fr 1fr; }
+
+    .buttons {
+      display: flex; flex-wrap: wrap; gap: 8px;
+    }
+    button {
+      appearance: none; border: 1px solid rgba(255,255,255,.12); color: var(--ink);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      padding: 10px 14px; border-radius: 12px; cursor: pointer; font-weight: 600; letter-spacing:.2px;
+      transition: transform .05s ease, box-shadow .2s ease, border-color .2s ease;
+    }
+    button:hover { border-color: rgba(34,211,238,.4); box-shadow: 0 6px 16px rgba(0,0,0,.25); }
+    button:active { transform: translateY(1px); }
+    .accent { border-color: rgba(34,211,238,.6); background: radial-gradient(120% 120% at 80% -20%, rgba(34,211,238,.18), transparent), linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04)); }
+    .alt    { border-color: rgba(167,139,250,.6); }
+
+    .footer {
+      display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; color: var(--muted);
+      border-top: 1px solid rgba(255,255,255,.07); padding: 12px 18px; font-size: 13px;
+    }
+    .badge { color: var(--panel); background: rgba(255,255,255,.9); padding: 2px 8px; border-radius: 999px; font-weight: 700; }
+
+    .toast { position: fixed; inset: auto 16px 16px auto; background: rgba(17,24,39,.9); color: #fff; padding: 8px 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,.1); opacity: 0; transform: translateY(8px); transition: all .25s ease; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+<body>
+  <main class="card" role="main" aria-labelledby="title">
+    <header>
+      <h1 id="title">Capitalize Converter Application</h1>
+      <div class="hint">Tip: Ctrl+1 Title • Ctrl+2 UPPER • Ctrl+3 lower • Ctrl+C Copy</div>
+    </header>
+
+    <section class="body">
+      <div class="row">
+        <label for="source">User Input</label>
+        <textarea id="source" placeholder="Type or paste your text here..."></textarea>
+      </div>
+
+      <div class="buttons">
+        <button class="accent" id="btnTitle" title="Capitalize the first letter of every word">Capitalize (Title Case)</button>
+        <button class="alt" id="btnSentence" title="Capitalize only the very first letter">Sentence case</button>
+        <button id="btnUpper" title="Convert to uppercase">UPPERCASE</button>
+        <button id="btnLower" title="Convert to lowercase">lowercase</button>
+        <button id="btnCopy" title="Copy the result to clipboard">Copy result</button>
+        <button id="btnSwap" title="Swap input ↔ output">Swap</button>
+        <span style="margin-left:auto"></span>
+      </div>
+
+      <div class="row">
+        <label for="result">Result</label>
+        <textarea id="result" class="output" readonly placeholder="Your converted text will appear here..."></textarea>
+      </div>
+    </section>
+
+    <div class="footer">
+      <div>Whitespace & line breaks are preserved. Hyphenated-words get capitalized after the hyphen.</div>
+      <div class="badge">HTML • CSS • JS</div>
+    </div>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const $ = (sel) => document.querySelector(sel);
+    const source = $('#source');
+    const result = $('#result');
+    const toast  = $('#toast');
+
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 1400);
+    }
+
+    // --- Converters ---
+    function toUpper(s){ return s.toUpperCase(); }
+    function toLower(s){ return s.toLowerCase(); }
+
+    // Title case that preserves whitespace and capitalizes after spaces or hyphens.
+    function toTitleCase(s){
+      return s
+        .toLowerCase()
+        .replace(/(^|[\s\u2010-\u2015-])([\p{L}])/gu, (m, p, ch) => p + ch.toUpperCase());
+    }
+
+    // Sentence case: uppercase first non-space character only; rest lowercased
+    function toSentenceCase(s){
+      const m = s.match(/^(\s*)(.)/s);
+      if (!m) return s;
+      const leading = m[1];
+      const first   = m[2];
+      const rest    = s.slice(leading.length + first.length).toLowerCase();
+      return leading + first.toUpperCase() + rest;
+    }
+
+    function convert(kind){
+      const input = source.value;
+      let out = '';
+      switch(kind){
+        case 'title': out = toTitleCase(input); break;
+        case 'upper': out = toUpper(input); break;
+        case 'lower': out = toLower(input); break;
+        case 'sentence': out = toSentenceCase(input); break;
+      }
+      result.value = out;
+      result.scrollTop = 0;
+    }
+
+    // Buttons
+    $('#btnTitle').addEventListener('click', () => convert('title'));
+    $('#btnUpper').addEventListener('click', () => convert('upper'));
+    $('#btnLower').addEventListener('click', () => convert('lower'));
+    $('#btnSentence').addEventListener('click', () => convert('sentence'));
+
+    $('#btnCopy').addEventListener('click', async () => {
+      if (!result.value) { showToast('Nothing to copy'); return; }
+      try {
+        await navigator.clipboard.writeText(result.value);
+        showToast('Copied!');
+      } catch {
+        // Fallback
+        result.select(); document.execCommand('copy');
+        showToast('Copied!');
+      }
+    });
+
+    $('#btnSwap').addEventListener('click', () => {
+      const a = source.value; const b = result.value;
+      source.value = b; result.value = a;
+      source.focus();
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+      if (e.ctrlKey && e.key === '1') { e.preventDefault(); convert('title'); }
+      if (e.ctrlKey && e.key === '2') { e.preventDefault(); convert('upper'); }
+      if (e.ctrlKey && e.key === '3') { e.preventDefault(); convert('lower'); }
+      if (e.ctrlKey && (e.key.toLowerCase() === 'c')) { if (document.activeElement !== source) { e.preventDefault(); $('#btnCopy').click(); } }
+    });
+
+    // Improve UX: focus input on load
+    window.addEventListener('DOMContentLoaded', () => source.focus());
+  </script>
+</body>
+</html>
+<!DOCTYPE html>
