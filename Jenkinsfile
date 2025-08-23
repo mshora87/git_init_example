@@ -23,7 +23,17 @@ pipeline {
     stage('Checkout') {
       steps {
         // For a multibranch pipeline, use 'checkout scm'
-        git url: 'https://github.com/mshora87/mywebsite.git', branch: 'main'
+        git url: 'https://github.com/mshora87/git_init_example.git', branch: 'main'
+      }
+    }
+
+  stage('Docker permission check') {
+      steps {
+        sh '''
+          set -eux
+          docker version
+          docker run --rm busybox:latest echo ok
+        '''
       }
     }
 
