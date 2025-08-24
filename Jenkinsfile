@@ -57,6 +57,7 @@ pipeline {
           # Run a fresh container
           docker run -d --name ${CONTAINER_NAME} --restart unless-stopped \
             -p ${HOST_PORT}:${CONTAINER_PORT} ${IMAGE_NAME}:latest
+          docker image rm -f $(docker image ls mywebsite-nginx --format '{{.Repository}}:{{.Tag}}' | grep -v ':latest')  
         '''
       }
     }
