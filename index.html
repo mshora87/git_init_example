@@ -94,7 +94,7 @@
   <main class="card" role="main" aria-labelledby="title">
     <header>
       <h1 id="title">******Capitalize Converter******</h1>
-      <div class="hint">Tip: Ctrl+1 Title • Ctrl+2 UPPER • Ctrl+3 lower • Ctrl+C Copy</div>
+      <div class="hint">Tip: Ctrl+1 Title • Ctrl+2 UPPER • Ctrl+3 lower • Ctrl+4 Split • Ctrl+C Copy</div>
     </header>
 
     <section class="body">
@@ -108,6 +108,10 @@
         <button class="alt" id="btnSentence" title="Capitalize only the very first letter">Sentence case</button>
         <button id="btnUpper" title="Convert to uppercase">UPPERCASE</button>
         <button id="btnLower" title="Convert to lowercase">lowercase</button>
+
+        <!-- NEW: Split button -->
+        <button id="btnSplit" title="Split into lines (one item per line). Shortcut: Ctrl+4">Split</button>
+
         <button id="btnCopy" title="Copy the result to clipboard">Copy result</button>
         <button id="btnSwap" title="Swap input ↔ output">Swap</button>
         <span style="margin-left:auto"></span>
@@ -160,6 +164,16 @@
       return leading + first.toUpperCase() + rest;
     }
 
+    // NEW: Split into lines (words/items -> one per line)
+    // Splits on commas, semicolons, pipes, slashes, tabs, newlines, and multiple spaces.
+    function splitToLines(s){
+      return s
+        .split(/[,\|;\/\t\r\n]+|\s{2,}|\s+(?=\S{2,})/g)  // flexible delimiters
+        .map(x => x.trim())
+        .filter(Boolean)
+        .join('\n');
+    }
+
     function convert(kind){
       const input = source.value;
       let out = '';
@@ -168,6 +182,7 @@
         case 'upper': out = toUpper(input); break;
         case 'lower': out = toLower(input); break;
         case 'sentence': out = toSentenceCase(input); break;
+        case 'split': out = splitToLines(input); break; // NEW
       }
       result.value = out;
       result.scrollTop = 0;
@@ -178,6 +193,7 @@
     $('#btnUpper').addEventListener('click', () => convert('upper'));
     $('#btnLower').addEventListener('click', () => convert('lower'));
     $('#btnSentence').addEventListener('click', () => convert('sentence'));
+    $('#btnSplit').addEventListener('click', () => convert('split')); // NEW
 
     $('#btnCopy').addEventListener('click', async () => {
       if (!result.value) { showToast('Nothing to copy'); return; }
@@ -202,7 +218,10 @@
       if (e.ctrlKey && e.key === '1') { e.preventDefault(); convert('title'); }
       if (e.ctrlKey && e.key === '2') { e.preventDefault(); convert('upper'); }
       if (e.ctrlKey && e.key === '3') { e.preventDefault(); convert('lower'); }
-      if (e.ctrlKey && (e.key.toLowerCase() === 'c')) { if (document.activeElement !== source) { e.preventDefault(); $('#btnCopy').click(); } }
+      if (e.ctrlKey && e.key === '4') { e.preventDefault(); convert('split'); }   // NEW
+      if (e.ctrlKey && (e.key.toLowerCase() === 'c')) {
+        if (document.activeElement !== source) { e.preventDefault(); $('#btnCopy').click(); }
+      }
     });
 
     // Improve UX: focus input on load
@@ -210,4 +229,3 @@
   </script>
 </body>
 </html>
-<!DOCTYPE html>
